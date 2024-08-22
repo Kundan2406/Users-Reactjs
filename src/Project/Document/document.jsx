@@ -8,7 +8,6 @@ const DocumentManager = () => {
     const [selectedDoc, setSelectedDoc] = useState('');
     const [documents, setDocuments] = useState(JSON.parse(localStorage.getItem('uploads')) || []);
     const [loginInfo] = useState(JSON.parse(localStorage.getItem('LoggedInfo')) || []);
-    const [showDocs] = useState(documents.filter((data) => data.userid === loginInfo.id) || []);
 
     const handleClose = () => {
         setShowModal(false);
@@ -74,6 +73,9 @@ const DocumentManager = () => {
         }
     };
 
+    // Filter the documents based on logged-in user
+    const filteredDocs = documents.filter((data) => data.userid === loginInfo.id);
+
     return (
         <>
             <div className='container'>
@@ -94,7 +96,7 @@ const DocumentManager = () => {
                         </thead>
                         <tbody>
                             {
-                                showDocs.map((item, index) => (
+                                filteredDocs.map((item, index) => (
                                     <tr key={index}>
                                         <td>{item.filelabel}</td>
                                         <td>{item.fileName}</td>
