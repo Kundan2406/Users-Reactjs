@@ -8,16 +8,20 @@ const EditUser = () => {
     const { userid } = location.state || {}; 
     const navigate = useNavigate(); 
 
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
+    let users = localStorage.getItem("users") ? JSON.parse(localStorage.getItem("users")) : [];
+
+    const user = users.find((user) => user.id === userid);
+
+    const [username, setUsername] = useState(user.username);
+    const [email, setEmail] = useState(user.email);
     const [errorname, setnameErrors] = useState("");
     const [erroremail, setemailErrors] = useState("");
 
-    let users = localStorage.getItem("users") ? JSON.parse(localStorage.getItem("users")) : [];
+    
 
     const [loggedInUser] = useState(JSON.parse(localStorage.getItem('LoggedInfo')));
 
-    const user = users.find((user) => user.id === userid);
+    
 
     const handleUsernameChange = (e) => {
         setUsername(e.target.value);
@@ -32,28 +36,27 @@ const EditUser = () => {
 
         let formIsValid = true;
 
-        if (!username) {
+        if (username === '') {
             formIsValid = false;
             setnameErrors('Username cannot be blank');
-        }
-        if (!email) {
+        } else if (email === '') {
             formIsValid = false;
             setemailErrors('Email cannot be blank');
         } else if (!/\S+@\S+\.\S+/.test(email)) {
             formIsValid = false;
             setemailErrors('Invalid Email');
+        } else {
+            if (formIsValid) {
+                const updatedUsers = users.map((user) =>
+                    user.id === userid ? { ...user, username: username, email: email } : user
+                );
+    
+                localStorage.setItem("users", JSON.stringify(updatedUsers));
+                alert('User information updated successfully!');
+                navigate("/users");
+            }
         }
-
-        if (formIsValid) {
-
-            const updatedUsers = users.map((user) =>
-                user.id === userid ? { ...user, username: username, email: email } : user
-            );
-
-            localStorage.setItem("users", JSON.stringify(updatedUsers));
-            alert('User information updated successfully!');
-            navigate("/users");
-        }
+        
     };
 
     return (
