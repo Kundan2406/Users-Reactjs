@@ -16,21 +16,19 @@ import RegisterSuccess from './Project/Register/registerSuccess';
 import NotFound from './Project/Welcome/notFound';
 
 const App = () => {
-  const [loginInfo] = useState(JSON.parse(localStorage.getItem('LoggedInfo')));
-  const isLoggedIn = loginInfo && Object.keys(loginInfo).length > 0;;
+  const [loginInfo] = useState(() => JSON.parse(localStorage.getItem('LoggedInfo')) || {});
+  const isLoggedIn = Boolean(loginInfo && Object.keys(loginInfo).length);
 
   return (
     <BrowserRouter>
+      <Menu />
       <Routes>
-        <Route path="" element={<Menu />}>
-          <Route path="" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" replace />} />
-          <Route path="chats" element={isLoggedIn ? <Chats /> : <Navigate to="/welcome" replace />} />
-          <Route path="users" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" replace />} />
-          <Route path="users/edit-user" element={isLoggedIn ? <EditUser /> : <Navigate to="/welcome" replace />} />
-          <Route path="document" element={isLoggedIn ? <Document /> : <Navigate to="/welcome" replace />} />
-          <Route path="loginsuccess" element={<LoginSuccess />} />
-        </Route>
-
+        <Route path="/" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" replace />} />
+        <Route path="chats" element={isLoggedIn ? <Chats /> : <Navigate to="/welcome" replace />} />
+        <Route path="users" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" replace />} />
+        <Route path="users/edit-user" element={isLoggedIn ? <EditUser /> : <Navigate to="/welcome" replace />} />
+        <Route path="document" element={isLoggedIn ? <Document /> : <Navigate to="/welcome" replace />} />
+        <Route path="loginsuccess" element={<LoginSuccess />} />
         <Route path="logout" element={<Logout />} />
         <Route path="login" element={!isLoggedIn ? <Login /> : <Navigate to="/users" replace />} />
         <Route path="welcome" element={!isLoggedIn ? <Welcome /> : <Navigate to="/users" replace />} />
