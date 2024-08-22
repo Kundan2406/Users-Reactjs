@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import './css/stylesheet.css';
 
@@ -16,21 +16,42 @@ import RegisterSuccess from './Project/Register/registerSuccess';
 import NotFound from './Project/Welcome/notFound';
 
 const App = () => {
-  const [loginInfo] = useState(() => JSON.parse(localStorage.getItem('LoggedInfo')) || {});
+  const [loginInfo, setLoginInfo] = useState(() => JSON.parse(localStorage.getItem('LoggedInfo')) || {});
   const isLoggedIn = Boolean(loginInfo && Object.keys(loginInfo).length);
+
+  // Update the state when localStorage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setLoginInfo(JSON.parse(localStorage.getItem('LoggedInfo')) || {});
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  // Optionally, directly update the state when handling login/logout
+  const handleLogin = (newLoginInfo) => {
+    localStorage.setItem('LoggedInfo', JSON.stringify(newLoginInfo));
+    setLoginInfo(newLoginInfo);
+  };
 
   return (
     <BrowserRouter>
-      <Menu />
       <Routes>
-        <Route path="/" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" replace />} />
-        <Route path="chats" element={isLoggedIn ? <Chats /> : <Navigate to="/welcome" replace />} />
-        <Route path="users" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" replace />} />
-        <Route path="users/edit-user" element={isLoggedIn ? <EditUser /> : <Navigate to="/welcome" replace />} />
-        <Route path="document" element={isLoggedIn ? <Document /> : <Navigate to="/welcome" replace />} />
-        <Route path="loginsuccess" element={<LoginSuccess />} />
+        <Route path="" element={<Menu />}>
+          <Route path="/" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" />} />
+          <Route path="chats" element={isLoggedIn ? <Chats /> : <Navigate to="/welcome" />} />
+          <Route path="users" element={isLoggedIn ? <UserList /> : <Navigate to="/welcome" />} />
+          <Route path="users/edit-user" element={isLoggedIn ? <EditUser /> : <Navigate to="/welcome" />} />
+          <Route path="document" element={isLoggedIn ? <Document /> : <Navigate to="/welcome" />} />
+          <Route path="loginsuccess" element={<LoginSuccess />} />
+        </Route>
+
         <Route path="logout" element={<Logout />} />
-        <Route path="login" element={!isLoggedIn ? <Login /> : <Navigate to="/users" replace />} />
+        <Route path="login" element={!isLoggedIn ? <Login onLogin={handleLogin} /> : <Navigate to="/users" replace />} />
         <Route path="welcome" element={!isLoggedIn ? <Welcome /> : <Navigate to="/users" replace />} />
         <Route path="register" element={!isLoggedIn ? <Register /> : <Navigate to="/users" replace />} />
         <Route path="registersuccess" element={!isLoggedIn ? <RegisterSuccess /> : <Navigate to="/users" replace />} />
