@@ -6,7 +6,7 @@ import ReusableModal from '../Modal/modal';
 function UserList() {
 
     const [Users, updateUsers] = useState(JSON.parse(localStorage.getItem('users')) || []);
-    const [loggedInUser] = useState(JSON.parse(localStorage.getItem('LoggedInfo')));
+    const [loggedInUser] = useState(JSON.parse(localStorage.getItem('LoggedInfo')) || {});
     const [showModal, setShowModal] = useState(false);
     const [action, setAction] = useState('');
     const [selectedId, setSelectedUser] = useState('');
@@ -59,11 +59,10 @@ function UserList() {
                                         <td>{item.username}</td>
                                         <td>{item.email}</td>
                                         <td>
-
                                             <Button variant="secondary" type="button" onClick={() => handleEditClick(item.id)} style={{ marginLeft: '10px' }}>
                                                 Edit
                                             </Button>
-                                            {item.id != loggedInUser.id && (
+                                            {loggedInUser && item.id !== loggedInUser.id && (
                                                 <Button variant="danger" onClick={() => handleShow('delete', item)} style={{ marginLeft: '10px' }}>
                                                     Delete
                                                 </Button>
